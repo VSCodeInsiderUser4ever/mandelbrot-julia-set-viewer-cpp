@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <complex.h>
 #include <iostream>
-#include <omp.h>
 
 // Define pre-processor constants
 
