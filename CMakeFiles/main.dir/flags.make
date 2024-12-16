@@ -6,5 +6,5 @@ CXX_DEFINES = -DSFML_STATIC
 
 CXX_INCLUDES = -isystem /home/cedric/Documents/GitHub/mandelbrot-julia-set-viewer-cpp/_deps/sfml-src/include
 
-CXX_FLAGS = 
+CXX_FLAGS = -Ofast
 

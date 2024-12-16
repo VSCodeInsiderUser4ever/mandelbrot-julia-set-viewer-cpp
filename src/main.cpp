@@ -14,13 +14,17 @@ using namespace std;
 
 // Define the mandelbrot function that takes the complex number c as an argument whose real value is the x value of the set and whose imaginary value is its y value on the set
 
-constexpr int mandelbrot(const complex<float> c, int& MAX_ITERS, complex<float>& EXPONANT) {
+constexpr float mandelbrot(const complex<float> c, int& MAX_ITERS, complex<float>& EXPONANT) {
     complex<float> z(0, 0);
 
     for(int i = 0; i < MAX_ITERS; i++) {
         z = pow(z, EXPONANT);
         z += c;
-        if(((z.real() * z.real()) + (z.imag() * z.imag())) > 16) return i;
+        if(norm(z) > 16) {
+            float log_nz = log2(norm(z));
+            float nu = log2(log_nz / 2.0f);
+            return max(0.f, i + 1 - nu);
+        }
     }
     return MAX_ITERS;
 }
@@ -28,11 +32,15 @@ constexpr int mandelbrot(const complex<float> c, int& MAX_ITERS, complex<float>&
 // Define the julia set function that takes the complex number c as an argument whose real value is the x value of the set and whose imaginary value is its y value on the set
 // This function also has a z argument that mandelbrot doesn't have, z represents a point in the mandelbrot set, the way its value works is the same as c's
 
-constexpr int juliaset(complex<float> z, complex<float> c, int& MAX_ITERS, complex<float>& EXPONANT) {
+constexpr float juliaset(complex<float> z, complex<float> c, int& MAX_ITERS, complex<float>& EXPONANT) {
     for(int i = 0; i < MAX_ITERS; i++) {
         z = pow(z, EXPONANT);
         z += c;
-        if(((z.real() * z.real()) + (z.imag() * z.imag())) > 16) return i;
+        if(norm(z) > 16) {
+            float log_nz = log2(norm(z));
+            float nu = log2(log_nz / 2.0f);
+            return max(0.f, i + 1 - nu);
+        };
     }
     return MAX_ITERS;
 }
@@ -109,11 +117,13 @@ void DrawJuliaSetToWindow(const int width, const int height, sf::RenderWindow& w
             // Compute the result of the julia set function
             float juliaset_result = juliaset(complex<float>(normalizedX, normalizedY), complex<float>(normalizedMandelbrotX, normalizedMandelbrotY), MAX_ITERS, EXPONANT);
 
-
             if(juliaset_result != MAX_ITERS) {
                 // If the point didn't escape, calculate its opacity by dividing its number of iterations by the maximum number of iterations and draw the pixel to the screen
                 unsigned int result = (juliaset_result / MAX_ITERS) * 255;
                 sf::Color color((result * 0x1010100u) + 0xFF);
+                if(result > 255) {
+                    cout << result << "\n" << juliaset_result << "\n";
+                }
                 image.setPixel(x, y, color);
             } else {
                 // Otherwise, draw a white pixel.
